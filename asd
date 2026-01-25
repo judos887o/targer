@@ -114,8 +114,49 @@ local function fireTouchFast(tool, targetChar)
     end
 end
 
-local function getKatanaOffset()
-    return Vector3.new((math.random() - 0.5) * 5, -2 + (math.random() - 0.5), (math.random() - 0.5) * 5)
+local katanaFlingPatterns = {
+    function(tHRP, time)
+        return tHRP.Position + Vector3.new(
+            math.sin(time * 47) * math.random(3, 8),
+            -3.2 + math.cos(time * 31) * math.random(1, 5),
+            math.sin(time * 53) * math.random(3, 8)
+        )
+    end,
+    
+    function(tHRP, time)
+        return tHRP.Position + Vector3.new(
+            math.random(-10, 10),
+            -3.2 + math.random(-3, 7),
+            math.random(-10, 10)
+        )
+    end,
+    
+    function(tHRP, time)
+        local angle = time * math.random(5, 25)
+        local radius = math.random(1, 6)
+        return tHRP.Position + Vector3.new(
+            math.cos(angle) * radius,
+            -3.2 + math.sin(time * math.random(3, 9)) * 2,
+            math.sin(angle) * radius
+        )
+    end,
+    
+    function(tHRP, time)
+        return tHRP.Position + Vector3.new(
+            math.sin(time * 17) * math.cos(time * 13) * 5,
+            -3.2 + math.sin(time * 19) * math.random(1, 4),
+            math.cos(time * 23) * math.sin(time * 11) * 5
+        )
+    end
+}
+
+local function getUnpredictableVelocity(time)
+    local patterns = {
+        Vector3.new(math.random(-150000, 150000), math.random(80000, 150000), math.random(-150000, 150000)),
+        Vector3.new(math.sin(time * 7) * 120000, 100000 + math.cos(time * 5) * 50000, math.cos(time * 11) * 120000),
+        Vector3.new(math.random(-200000, 200000), math.random(100000, 200000), math.random(-200000, 200000))
+    }
+    return patterns[math.random(1, #patterns)]
 end
 
 local function startFling()
@@ -129,10 +170,23 @@ local function startFling()
             
             if hrp and tHRP then
                 Workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChild("Humanoid")
-                local flingPos = tHRP.Position + Vector3.new(math.random(-2,2), math.random(-2,2), math.random(-2,2))
-                hrp.CFrame = CFrame.new(flingPos, tHRP.Position)
-                hrp.Velocity = Vector3.new(15000, 15000, 15000)
-                hrp.RotVelocity = Vector3.new(15000, 15000, 15000)
+                local time = tick()
+                local angle = time * math.random(5, 25)
+                local radius = math.random(1, 6)
+                local position = tHRP.Position + Vector3.new(
+                    math.cos(angle) * radius,
+                    math.sin(time * math.random(3, 9)) * 2,
+                    math.sin(angle) * radius
+                )
+                local velocity = getUnpredictableVelocity(time)
+                
+                hrp.CFrame = CFrame.new(position, tHRP.Position)
+                hrp.Velocity = velocity
+                hrp.RotVelocity = Vector3.new(
+                    math.random(-10000, 10000),
+                    math.random(-10000, 10000),
+                    math.random(-10000, 10000)
+                )
             end
             task.wait()
         end
@@ -154,7 +208,7 @@ local function performOpKill(dt)
     if not target or not target.Character then return end
     
     local tHRP = target.Character:FindFirstChild("HumanoidRootPart")
-    local tHum = target.Character:FindFirstChild("Humanoid")
+    local tHum = target.Character:FindFirstChildOfClass("Humanoid")
     local myHRP = getLocalHRP()
     
     if tHRP and myHRP and tHum then
@@ -177,7 +231,6 @@ local function performOpKill(dt)
         if tool then 
             local ammo = tool:FindFirstChild("Ammo") or tool:FindFirstChild("AMMO")
             if ammo and tonumber(ammo.Value) <= 0 then
-                -- Reload Logic in OP Kill
                 if (tick() - lastReloadTime) > 2 then
                     lastReloadTime = tick()
                     task.spawn(function()
@@ -186,7 +239,7 @@ local function performOpKill(dt)
                         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.R, false, game)
                     end)
                 end
-                return -- Stop shooting while reloading
+                return
             end
             tool:Activate() 
         else
@@ -219,7 +272,6 @@ local function performAura(dt)
 end
 
 RunService.Heartbeat:Connect(function(dt)
-    -- GLOBAL AUTO RELOAD CHECK
     if Shared.AutoReload then
         local tool = lp.Character and lp.Character:FindFirstChildOfClass("Tool")
         if tool then
@@ -290,12 +342,19 @@ RunService.Heartbeat:Connect(function(dt)
                 local tool = getKatanaTool(char)
                 if tool then
                     if tool.Parent ~= char then hum:EquipTool(tool) end
-                    local tPos = tHRP.Position
-                    local offset = getKatanaOffset()
-                    local newPos = tPos + offset
-                    hrp.CFrame = CFrame.new(newPos, tPos)
-                    hrp.AssemblyLinearVelocity = Vector3.new(0, 50, 0)
-                    hrp.AssemblyAngularVelocity = Vector3.zero
+                    local time = tick()
+                    local pattern = katanaFlingPatterns[math.random(1, #katanaFlingPatterns)]
+                    local position = pattern(tHRP, time)
+                    local velocity = getUnpredictableVelocity(time)
+                    
+                    hrp.CFrame = CFrame.new(position, tHRP.Position)
+                    hrp.Velocity = velocity
+                    hrp.RotVelocity = Vector3.new(
+                        math.random(-10000, 10000),
+                        math.random(-10000, 10000),
+                        math.random(-10000, 10000)
+                    )
+                    
                     pcall(function() tool:Activate() end)
                     fireTouchFast(tool, target.Character)
                 end
