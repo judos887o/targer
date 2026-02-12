@@ -17,6 +17,19 @@ local Shared = getgenv().SchmecktHubPC or {}
 getgenv().SchmecktHubPC = Shared
 local key = "TargetScript"
 
+local SCALE = 1
+if Shared.Platform == "Mobile" then
+    SCALE = 1 / 2.2
+end
+
+local function scaleUDim(x, y)
+    return UDim2.new(0, x * SCALE, 0, y * SCALE)
+end
+
+local function scaleSize(s)
+    return math.floor(s * SCALE)
+end
+
 if Shared.Connections and Shared.Connections[key] then
     for _, c in pairs(Shared.Connections[key]) do
         pcall(function() c:Disconnect() end)
@@ -363,27 +376,27 @@ TargetGui.Parent = lp:WaitForChild("PlayerGui")
 
 local MainShadow = Instance.new("Frame")
 MainShadow.Name = "Shadow"
-MainShadow.Size = UDim2.new(0, 260, 0, 340)
-MainShadow.Position = UDim2.new(1, -520, 1, -355)
+MainShadow.Size = scaleUDim(260, 340)
+MainShadow.Position = UDim2.new(1, -(520 * SCALE), 1, -(355 * SCALE))
 MainShadow.BackgroundColor3 = Theme.Shadow
 MainShadow.BackgroundTransparency = 0.5
 MainShadow.BorderSizePixel = 0
 MainShadow.Parent = TargetGui
-Instance.new("UICorner", MainShadow).CornerRadius = UDim.new(0, 16)
+Instance.new("UICorner", MainShadow).CornerRadius = UDim.new(0, 16 * SCALE)
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 250, 0, 330)
-MainFrame.Position = UDim2.new(1, -515, 1, -350)
+MainFrame.Size = scaleUDim(250, 330)
+MainFrame.Position = UDim2.new(1, -(515 * SCALE), 1, -(350 * SCALE))
 MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BackgroundTransparency = 0.02
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = TargetGui
 
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14 * SCALE)
 
 local MainStroke = Instance.new("UIStroke")
-MainStroke.Thickness = 2
+MainStroke.Thickness = 2 * SCALE
 MainStroke.Transparency = 0
 MainStroke.Parent = MainFrame
 
@@ -398,11 +411,11 @@ mainStrokeGrad.Parent = MainStroke
 
 local HeaderFrame = Instance.new("Frame")
 HeaderFrame.Name = "Header"
-HeaderFrame.Size = UDim2.new(1, 0, 0, 50)
+HeaderFrame.Size = UDim2.new(1, 0, 0, 50 * SCALE)
 HeaderFrame.BackgroundColor3 = Theme.Card
 HeaderFrame.BorderSizePixel = 0
 HeaderFrame.Parent = MainFrame
-Instance.new("UICorner", HeaderFrame).CornerRadius = UDim.new(0, 14)
+Instance.new("UICorner", HeaderFrame).CornerRadius = UDim.new(0, 14 * SCALE)
 
 local headerGlow = Instance.new("Frame")
 headerGlow.Size = UDim2.new(1, 0, 1, 0)
@@ -410,30 +423,30 @@ headerGlow.BackgroundColor3 = Theme.Purple
 headerGlow.BackgroundTransparency = 0.88
 headerGlow.BorderSizePixel = 0
 headerGlow.Parent = HeaderFrame
-Instance.new("UICorner", headerGlow).CornerRadius = UDim.new(0, 14)
+Instance.new("UICorner", headerGlow).CornerRadius = UDim.new(0, 14 * SCALE)
 
 local HeaderLogo1 = Instance.new("ImageLabel")
-HeaderLogo1.Size = UDim2.new(0, 28, 0, 28)
-HeaderLogo1.Position = UDim2.new(0, 10, 0.5, -14)
+HeaderLogo1.Size = scaleUDim(28, 28)
+HeaderLogo1.Position = UDim2.new(0, 10 * SCALE, 0.5, -(14 * SCALE))
 HeaderLogo1.BackgroundColor3 = Theme.Background
 HeaderLogo1.Image = LOGO_ASSET
 HeaderLogo1.ScaleType = Enum.ScaleType.Crop
 HeaderLogo1.Parent = HeaderFrame
-Instance.new("UICorner", HeaderLogo1).CornerRadius = UDim.new(0, 6)
+Instance.new("UICorner", HeaderLogo1).CornerRadius = UDim.new(0, 6 * SCALE)
 
 local HeaderX = Instance.new("TextLabel")
-HeaderX.Size = UDim2.new(0, 14, 0, 28)
-HeaderX.Position = UDim2.new(0, 40, 0.5, -14)
+HeaderX.Size = scaleUDim(14, 28)
+HeaderX.Position = UDim2.new(0, 40 * SCALE, 0.5, -(14 * SCALE))
 HeaderX.BackgroundTransparency = 1
 HeaderX.Text = "X"
 HeaderX.Font = Enum.Font.GothamBlack
-HeaderX.TextSize = 10
+HeaderX.TextSize = scaleSize(10)
 HeaderX.TextColor3 = Theme.Purple
 HeaderX.Parent = HeaderFrame
 
 local HeaderLogo2 = Instance.new("ImageLabel")
-HeaderLogo2.Size = UDim2.new(0, 24, 0, 24)
-HeaderLogo2.Position = UDim2.new(0, 56, 0.5, -12)
+HeaderLogo2.Size = scaleUDim(24, 24)
+HeaderLogo2.Position = UDim2.new(0, 56 * SCALE, 0.5, -(12 * SCALE))
 HeaderLogo2.BackgroundTransparency = 1
 HeaderLogo2.Image = LOGO2_ASSET
 HeaderLogo2.ScaleType = Enum.ScaleType.Fit
@@ -441,12 +454,12 @@ HeaderLogo2.Parent = HeaderFrame
 Instance.new("UICorner", HeaderLogo2).CornerRadius = UDim.new(1, 0)
 
 local HeaderText = Instance.new("TextLabel")
-HeaderText.Size = UDim2.new(1, -90, 0, 18)
-HeaderText.Position = UDim2.new(0, 88, 0, 8)
+HeaderText.Size = UDim2.new(1, -(90 * SCALE), 0, 18 * SCALE)
+HeaderText.Position = UDim2.new(0, 88 * SCALE, 0, 8 * SCALE)
 HeaderText.BackgroundTransparency = 1
 HeaderText.Text = "TARGET PANEL"
 HeaderText.Font = Enum.Font.GothamBlack
-HeaderText.TextSize = 11
+HeaderText.TextSize = scaleSize(11)
 HeaderText.TextColor3 = Theme.Accent
 HeaderText.TextXAlignment = Enum.TextXAlignment.Left
 HeaderText.Parent = HeaderFrame
@@ -461,50 +474,50 @@ headerTextGrad.Color = ColorSequence.new({
 headerTextGrad.Parent = HeaderText
 
 local HeaderSub = Instance.new("TextLabel")
-HeaderSub.Size = UDim2.new(1, -90, 0, 14)
-HeaderSub.Position = UDim2.new(0, 88, 0, 26)
+HeaderSub.Size = UDim2.new(1, -(90 * SCALE), 0, 14 * SCALE)
+HeaderSub.Position = UDim2.new(0, 88 * SCALE, 0, 26 * SCALE)
 HeaderSub.BackgroundTransparency = 1
 HeaderSub.Text = "Meulios X ShadowPepper"
 HeaderSub.Font = Enum.Font.GothamMedium
-HeaderSub.TextSize = 9
+HeaderSub.TextSize = scaleSize(9)
 HeaderSub.TextColor3 = Theme.SubText
 HeaderSub.TextXAlignment = Enum.TextXAlignment.Left
 HeaderSub.Parent = HeaderFrame
 
 local InputSection = Instance.new("Frame")
 InputSection.Name = "InputSection"
-InputSection.Size = UDim2.new(1, -16, 0, 40)
-InputSection.Position = UDim2.new(0, 8, 0, 56)
+InputSection.Size = UDim2.new(1, -(16 * SCALE), 0, 40 * SCALE)
+InputSection.Position = UDim2.new(0, 8 * SCALE, 0, 56 * SCALE)
 InputSection.BackgroundColor3 = Theme.Card
 InputSection.BorderSizePixel = 0
 InputSection.Parent = MainFrame
-Instance.new("UICorner", InputSection).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", InputSection).CornerRadius = UDim.new(0, 10 * SCALE)
 
 local InputStroke = Instance.new("UIStroke")
 InputStroke.Color = Theme.Stroke
-InputStroke.Thickness = 1.5
+InputStroke.Thickness = 1.5 * SCALE
 InputStroke.Transparency = 0.3
 InputStroke.Parent = InputSection
 
 local InputIcon = Instance.new("TextLabel")
-InputIcon.Size = UDim2.new(0, 30, 1, 0)
-InputIcon.Position = UDim2.new(0, 8, 0, 0)
+InputIcon.Size = UDim2.new(0, 30 * SCALE, 1, 0)
+InputIcon.Position = UDim2.new(0, 8 * SCALE, 0, 0)
 InputIcon.BackgroundTransparency = 1
 InputIcon.Text = "T"
 InputIcon.Font = Enum.Font.GothamBlack
-InputIcon.TextSize = 18
+InputIcon.TextSize = scaleSize(18)
 InputIcon.TextColor3 = Theme.Purple
 InputIcon.Parent = InputSection
 
 local TargetInput = Instance.new("TextBox")
 TargetInput.Name = "TargetInput"
-TargetInput.Size = UDim2.new(1, -50, 1, -10)
-TargetInput.Position = UDim2.new(0, 42, 0, 5)
+TargetInput.Size = UDim2.new(1, -(50 * SCALE), 1, -(10 * SCALE))
+TargetInput.Position = UDim2.new(0, 42 * SCALE, 0, 5 * SCALE)
 TargetInput.BackgroundTransparency = 1
 TargetInput.Text = Shared.TargetUsername or ""
 TargetInput.PlaceholderText = "Enter player name..."
 TargetInput.Font = Enum.Font.GothamMedium
-TargetInput.TextSize = 13
+TargetInput.TextSize = scaleSize(13)
 TargetInput.TextColor3 = Theme.Text
 TargetInput.PlaceholderColor3 = Theme.SubText
 TargetInput.TextXAlignment = Enum.TextXAlignment.Left
@@ -562,49 +575,49 @@ end)
 
 local ButtonContainer = Instance.new("Frame")
 ButtonContainer.Name = "ButtonContainer"
-ButtonContainer.Size = UDim2.new(1, -16, 0, 220)
-ButtonContainer.Position = UDim2.new(0, 8, 0, 102)
+ButtonContainer.Size = UDim2.new(1, -(16 * SCALE), 0, 220 * SCALE)
+ButtonContainer.Position = UDim2.new(0, 8 * SCALE, 0, 102 * SCALE)
 ButtonContainer.BackgroundTransparency = 1
 ButtonContainer.Parent = MainFrame
 
 local ListLayout = Instance.new("UIListLayout")
 ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-ListLayout.Padding = UDim.new(0, 6)
+ListLayout.Padding = UDim.new(0, 6 * SCALE)
 ListLayout.Parent = ButtonContainer
 
 local function CreateActionButton(text, callback)
     local BtnFrame = Instance.new("Frame")
-    BtnFrame.Size = UDim2.new(1, 0, 0, 32)
+    BtnFrame.Size = UDim2.new(1, 0, 0, 32 * SCALE)
     BtnFrame.BackgroundColor3 = Theme.Card
     BtnFrame.BorderSizePixel = 0
     BtnFrame.Parent = ButtonContainer
-    Instance.new("UICorner", BtnFrame).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", BtnFrame).CornerRadius = UDim.new(0, 8 * SCALE)
     local BtnStroke = Instance.new("UIStroke")
     BtnStroke.Color = Theme.Stroke
-    BtnStroke.Thickness = 1.5
+    BtnStroke.Thickness = 1.5 * SCALE
     BtnStroke.Transparency = 0.3
     BtnStroke.Parent = BtnFrame
     local TextLabel = Instance.new("TextLabel")
-    TextLabel.Size = UDim2.new(1, -50, 1, 0)
-    TextLabel.Position = UDim2.new(0, 12, 0, 0)
+    TextLabel.Size = UDim2.new(1, -(50 * SCALE), 1, 0)
+    TextLabel.Position = UDim2.new(0, 12 * SCALE, 0, 0)
     TextLabel.BackgroundTransparency = 1
     TextLabel.Text = text
     TextLabel.Font = Enum.Font.GothamBold
-    TextLabel.TextSize = 11
+    TextLabel.TextSize = scaleSize(11)
     TextLabel.TextColor3 = Theme.Text
     TextLabel.TextXAlignment = Enum.TextXAlignment.Left
     TextLabel.Parent = BtnFrame
     local ActionBadge = Instance.new("TextLabel")
-    ActionBadge.Size = UDim2.new(0, 30, 0, 14)
-    ActionBadge.Position = UDim2.new(1, -38, 0.5, -7)
+    ActionBadge.Size = scaleUDim(30, 14)
+    ActionBadge.Position = UDim2.new(1, -(38 * SCALE), 0.5, -(7 * SCALE))
     ActionBadge.BackgroundColor3 = Theme.Purple
     ActionBadge.BorderSizePixel = 0
     ActionBadge.Text = "GO"
     ActionBadge.Font = Enum.Font.GothamBlack
-    ActionBadge.TextSize = 8
+    ActionBadge.TextSize = scaleSize(8)
     ActionBadge.TextColor3 = Theme.Text
     ActionBadge.Parent = BtnFrame
-    Instance.new("UICorner", ActionBadge).CornerRadius = UDim.new(0, 4)
+    Instance.new("UICorner", ActionBadge).CornerRadius = UDim.new(0, 4 * SCALE)
     local Button = Instance.new("TextButton")
     Button.Size = UDim2.new(1, 0, 1, 0)
     Button.BackgroundTransparency = 1
@@ -627,36 +640,36 @@ end
 
 local function CreateToggleButton(text, sharedKey)
     local BtnFrame = Instance.new("Frame")
-    BtnFrame.Size = UDim2.new(1, 0, 0, 32)
+    BtnFrame.Size = UDim2.new(1, 0, 0, 32 * SCALE)
     BtnFrame.BackgroundColor3 = Theme.Card
     BtnFrame.BorderSizePixel = 0
     BtnFrame.Parent = ButtonContainer
-    Instance.new("UICorner", BtnFrame).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", BtnFrame).CornerRadius = UDim.new(0, 8 * SCALE)
     local BtnStroke = Instance.new("UIStroke")
     BtnStroke.Color = Shared[sharedKey] and Theme.Purple or Theme.Stroke
-    BtnStroke.Thickness = 1.5
+    BtnStroke.Thickness = 1.5 * SCALE
     BtnStroke.Transparency = Shared[sharedKey] and 0 or 0.3
     BtnStroke.Parent = BtnFrame
     local TextLabel = Instance.new("TextLabel")
-    TextLabel.Size = UDim2.new(1, -55, 1, 0)
-    TextLabel.Position = UDim2.new(0, 12, 0, 0)
+    TextLabel.Size = UDim2.new(1, -(55 * SCALE), 1, 0)
+    TextLabel.Position = UDim2.new(0, 12 * SCALE, 0, 0)
     TextLabel.BackgroundTransparency = 1
     TextLabel.Text = text
     TextLabel.Font = Enum.Font.GothamBold
-    TextLabel.TextSize = 11
+    TextLabel.TextSize = scaleSize(11)
     TextLabel.TextColor3 = Theme.Text
     TextLabel.TextXAlignment = Enum.TextXAlignment.Left
     TextLabel.Parent = BtnFrame
     local ToggleBg = Instance.new("Frame")
-    ToggleBg.Size = UDim2.new(0, 36, 0, 18)
-    ToggleBg.Position = UDim2.new(1, -44, 0.5, -9)
+    ToggleBg.Size = scaleUDim(36, 18)
+    ToggleBg.Position = UDim2.new(1, -(44 * SCALE), 0.5, -(9 * SCALE))
     ToggleBg.BackgroundColor3 = Shared[sharedKey] and Theme.Purple or Color3.fromRGB(40, 20, 30)
     ToggleBg.BorderSizePixel = 0
     ToggleBg.Parent = BtnFrame
     Instance.new("UICorner", ToggleBg).CornerRadius = UDim.new(1, 0)
     local ToggleCircle = Instance.new("Frame")
-    ToggleCircle.Size = UDim2.new(0, 14, 0, 14)
-    ToggleCircle.Position = Shared[sharedKey] and UDim2.new(0, 20, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
+    ToggleCircle.Size = scaleUDim(14, 14)
+    ToggleCircle.Position = Shared[sharedKey] and UDim2.new(0, 20 * SCALE, 0.5, -(7 * SCALE)) or UDim2.new(0, 2 * SCALE, 0.5, -(7 * SCALE))
     ToggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     ToggleCircle.BorderSizePixel = 0
     ToggleCircle.Parent = ToggleBg
@@ -670,7 +683,7 @@ local function CreateToggleButton(text, sharedKey)
         Shared[sharedKey] = not Shared[sharedKey]
         local enabled = Shared[sharedKey]
         TweenService:Create(ToggleCircle, TweenInfo.new(0.2, Enum.EasingStyle.Quart), {
-            Position = enabled and UDim2.new(0, 20, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
+            Position = enabled and UDim2.new(0, 20 * SCALE, 0.5, -(7 * SCALE)) or UDim2.new(0, 2 * SCALE, 0.5, -(7 * SCALE))
         }):Play()
         TweenService:Create(ToggleBg, TweenInfo.new(0.2, Enum.EasingStyle.Quart), {
             BackgroundColor3 = enabled and Theme.Purple or Color3.fromRGB(40, 20, 30)
@@ -770,8 +783,8 @@ end)
 MainFrame.Size = UDim2.new(0, 0, 0, 0)
 MainShadow.Size = UDim2.new(0, 0, 0, 0)
 MainShadow.BackgroundTransparency = 1
-TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 250, 0, 330)}):Play()
-TweenService:Create(MainShadow, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 260, 0, 340)}):Play()
+TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = scaleUDim(250, 330)}):Play()
+TweenService:Create(MainShadow, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = scaleUDim(260, 340)}):Play()
 TweenService:Create(MainShadow, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5}):Play()
 
 local mainLoop = RunService.Heartbeat:Connect(function(dt)
