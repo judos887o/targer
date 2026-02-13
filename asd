@@ -8,8 +8,8 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
 local MainEvent = ReplicatedStorage:FindFirstChild("MainEvent") or ReplicatedStorage:FindFirstChild("MAINEVENT")
-if not MainEvent then 
-    MainEvent = ReplicatedStorage:WaitForChild("MainEvent", 1) 
+if not MainEvent then
+    MainEvent = ReplicatedStorage:WaitForChild("MainEvent", 1)
 end
 
 local lp = Players.LocalPlayer
@@ -75,6 +75,7 @@ local defaultCollisions = setmetatable({}, {__mode = "k"})
 local noclipActive = false
 local opAngle = 0
 local lastReloadTime = 0
+local lastHighlightTarget = nil
 
 local katanaPatterns = {
     function(tHRP, time)
@@ -188,27 +189,28 @@ end
 
 local function updateHighlight()
     if not Shared.HighlightTarget then
-        if highlight then highlight:Destroy() end
-        highlight = nil
+        if highlight then highlight:Destroy() highlight = nil end
+        lastHighlightTarget = nil
         return
     end
     local target = getTarget()
     local char = target and target.Character
-    if not char then 
-        if highlight then highlight:Destroy() end
-        highlight = nil
-        return 
+    if not char then
+        if highlight then highlight:Destroy() highlight = nil end
+        lastHighlightTarget = nil
+        return
     end
-    if not highlight then
-        highlight = Instance.new("Highlight")
-        highlight.FillColor = Color3.fromRGB(255, 70, 70)
-        highlight.OutlineColor = Color3.new(1, 1, 1)
-        highlight.FillTransparency = 0.5
-        highlight.OutlineTransparency = 0
-        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        highlight.Parent = Workspace
-    end
+    if lastHighlightTarget == char and highlight and highlight.Parent then return end
+    if highlight then highlight:Destroy() end
+    highlight = Instance.new("Highlight")
+    highlight.FillColor = Color3.fromRGB(255, 70, 70)
+    highlight.OutlineColor = Color3.new(1, 1, 1)
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     highlight.Adornee = char
+    highlight.Parent = Workspace
+    lastHighlightTarget = char
 end
 
 local function getKatanaTool(char)
@@ -392,7 +394,6 @@ MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BackgroundTransparency = 0.02
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = TargetGui
-
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14 * SCALE)
 
 local MainStroke = Instance.new("UIStroke")
@@ -719,12 +720,16 @@ CreateToggleButton("Fling", "Fling")
 CreateToggleButton("OP Kill", "OPKill")
 
 local mainColorPhase = 0
+local lastColorUpdate = 0
 local mainColorConnection = RunService.Heartbeat:Connect(function(dt)
     if not MainFrame.Parent then
         mainColorConnection:Disconnect()
         return
     end
-    mainColorPhase = (mainColorPhase + dt * 0.6) % 1
+    lastColorUpdate = lastColorUpdate + dt
+    if lastColorUpdate < 0.05 then return end
+    lastColorUpdate = 0
+    mainColorPhase = (mainColorPhase + 0.05 * 0.6) % 1
     local function lerpColor(t)
         local colors = {
             Color3.fromRGB(255, 20, 147),
@@ -787,16 +792,21 @@ TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.Ea
 TweenService:Create(MainShadow, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = scaleUDim(260, 340)}):Play()
 TweenService:Create(MainShadow, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5}):Play()
 
+local lastHighlightUpdate = 0
 local mainLoop = RunService.Heartbeat:Connect(function(dt)
     local isDoingAttack = Shared.AutoKatanaKill or Shared.Fling or Shared.OPKill
-    
+
     if Shared.ViewTarget and not isDoingAttack then
         spectateTarget()
     elseif not isDoingAttack then
         spectateSelf()
     end
 
-    updateHighlight()
+    lastHighlightUpdate = lastHighlightUpdate + dt
+    if lastHighlightUpdate > 0.5 then
+        lastHighlightUpdate = 0
+        updateHighlight()
+    end
 
     local char = lp and lp.Character
     if not char then return end
@@ -845,6 +855,7 @@ table.insert(Shared.Connections[key], mainLoop)
 local playerRemoving = Players.PlayerRemoving:Connect(function(plr)
     if Shared.TargetUsername and plr.Name == Shared.TargetUsername then
         if highlight then highlight:Destroy() highlight = nil end
+        lastHighlightTarget = nil
         stopKatanaLoop()
         stopFling()
         Shared.TargetUsername = nil
