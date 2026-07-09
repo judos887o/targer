@@ -192,14 +192,22 @@ local function fireTouchFast(tool, targetChar)
     if tHRP then pcall(firetouchinterest,handle,tHRP,0) pcall(firetouchinterest,handle,tHRP,1) end
 end
 
-local function spectateTarget()
-    local t=getTarget()
-    if t and t.Character then local h=t.Character:FindFirstChildOfClass("Humanoid") if h then Workspace.CurrentCamera.CameraSubject=h end end
-end
-
 local function spectateSelf()
     local h=lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
     if h then Workspace.CurrentCamera.CameraSubject=h end
+end
+
+-- Verbessertes Spectate mit Fallback, falls Target nicht im Server ist
+local function spectateTarget()
+    local t=getTarget()
+    if t and t.Character then 
+        local h=t.Character:FindFirstChildOfClass("Humanoid") 
+        if h then 
+            Workspace.CurrentCamera.CameraSubject=h 
+            return
+        end 
+    end
+    spectateSelf() -- Fallback auf sich selbst
 end
 
 local function startKatanaLoop()
@@ -579,15 +587,18 @@ local mainLoop = RunService.Heartbeat:Connect(function(dt)
 end)
 table.insert(Shared.Connections[key], mainLoop)
 
+-- FIX: Verlässt der Spieler das Spiel, bleibt sein Name im System eingespeichert!
 local playerRemoving = Players.PlayerRemoving:Connect(function(plr)
     if Shared.TargetUsername and plr.Name == Shared.TargetUsername then
+        -- Nur visuelle Effekte bereinigen, damit das Spiel flüssig weiterläuft
         if highlight then highlight:Destroy() highlight = nil end
         lastHighlightTarget = nil
-        stopKatanaLoop()
-        stopFling()
-        Shared.TargetUsername = nil
-        TargetInput.Text = ""
         spectateSelf()
+        
+        -- HINWEIS: Shared.TargetUsername & UI-Text werden NICHT mehr gelöscht!
+        -- Sobald der Spieler wieder joint, wird er sofort wieder getargeted.
     end
 end)
 table.insert(Shared.Connections[key], playerRemoving)
+
+return Shared
